@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${vcpkgRoot}/x64-windows/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+            "intelliSenseMode": "${default}",
+            "configurationProvider": "go2sh.cmake-integration"
+        }
+    ],
+    "version": 4
+}

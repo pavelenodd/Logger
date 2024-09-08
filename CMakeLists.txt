@@ -21,13 +21,15 @@ link_directories(${Boost_LIBRARY_DIRS})
 # Добавить исполняемый файл
 add_executable(Boost_logger 
     src/main.cpp
-    src/logger.cpp
     src/logger.h
 )
 
 
-# Линковка библиотек Boost
-target_link_libraries(Boost_logger ${Boost_LIBRARIES})
+if(WIN32)
+    target_link_libraries(Boost_logger ${Boost_LIBRARIES} ws2_32)
+else()
+    target_link_libraries(Boost_logger ${Boost_LIBRARIES})
+endif()
 
 # Показать сообщения, если библиотеки Boost не найдены
 if(NOT Boost_FOUND)
