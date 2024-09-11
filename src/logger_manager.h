@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "Debug/debugger.h"
 
 using boost_tcp = boost::asio::ip::tcp;
 
@@ -20,8 +21,10 @@ using boost_tcp = boost::asio::ip::tcp;
  */
 class BaseLogger {
  protected:
-  BaseLogger() {}
+  Debugger* debugger_;
 
+ protected:
+  BaseLogger() {}
   virtual ~BaseLogger() {};
 
  public:
@@ -31,29 +34,34 @@ class BaseLogger {
   virtual void Disconnected() = 0;
   virtual void HanleMessage(std::string message) = 0;
 };
+/*
+работы по подключению TCP/IP сервера к проекту
+ */
 
 class TCP_IP_Logger : public BaseLogger {
  private:
   boost::asio::io_context io_context_;
-  int port_;
   static TCP_IP_Logger* instance_;
-  TCP_IP_Logger* logger_;
+  int port_;
+  TCP_Server* tcp_server_;
 
  protected:
  public:
  private:
   // Приватный конструктор для предотвращения создания объектов извне
   TCP_IP_Logger(int L_port) : port_(L_port) {
-    static MyServer server(io_context_);
+    tcp_server_ = new TCP_Server(io_context_, port_);
+    debugger_ = new Debugger("TCP/IP Logger");
   }
-  ~TCP_IP_Logger() = default;
+  ~TCP_IP_Logger() { delete tcp_server_; }
 
  public:
   /**
    * Метод для инициализации TCP/IP логгера
    */
   void StartConected() override {
-    std::cout << "TCP/IP Logger initialized on port " << port_ << std::endl;
+    debugger_->Info("Starting TCP/IP Logger on port " + std::to_string(port_));
+    tcp_server_->StartAccept();
   }
 
   // Метод для получения единственного экземпляра класса (Singleton)
@@ -65,16 +73,18 @@ class TCP_IP_Logger : public BaseLogger {
   }
 
   void Connected() override {
-    std::cout << "Connected to TCP/IP server on port " << port_ << std::endl;
+    debugger_->Info("Connected to TCP/IP server on port " +
+                    std::to_string(port_));
   }
   void Reconected() override {
-    std::cout << "Reconnected to TCP/IP server on port " << port_ << std::endl;
+    debugger_->Info("Reconnected to TCP/IP server on port " +
+                    std::to_string(port_));
   }
   void Disconnected() override {
-    std::cout << "Disconnected from TCP/IP server" << std::endl;
+    debugger_->Info("Disconnected from TCP/IP server");
   }
   void HanleMessage(std::string message) override {
-    std::cout << "Received message: " << message << std::endl;
+    debugger_->Info("Received message: " + message);
   }
 };
 TCP_IP_Logger* TCP_IP_Logger::instance_ = nullptr;  // TODO перенести в cpp

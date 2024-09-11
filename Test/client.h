@@ -6,7 +6,7 @@
 
 using boost::asio::ip::tcp;  // Используем пространство имен для TCP
 
-int main() {
+/*int main() {
   try {
     // Создаем контекст для управления асинхронными операциями
     boost::asio::io_context io_context;
@@ -40,4 +40,4 @@ int main() {
   }
 
   return 0;
-}
+}*/
