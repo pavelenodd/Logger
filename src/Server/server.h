@@ -1,30 +1,23 @@
-/*#pragma once
 #include <boost/asio.hpp>
 #include <iostream>
-#include <string>
-#include <vector>
-
-using boost::asio::ip::tcp;  // Используем пространство имен для TCP
-
-struct ClientInfo {
-  const std::string ip_address_;
-  const int port_;
-
-  ClientInfo() = delete;
-  ClientInfo(std::string L_ip_address, int L_port, tcp::socket L_socket)
-      : ip_address_(L_ip_address), port_(L_port) {}
-};
 
 #define PORT 8080  // Порт, на котором сервер будет ожидать подключения
 
-class TCP_Server {
- private:
-  tcp::acceptor acceptor_;  // Объект, который принимает входящие подключения
-  const int port_;  // Порт, на котором сервер будет ожидать подключения
+using boost::asio::ip::tcp;  // Используем пространство имен для TCP
+
+class MyServer {
+ public:
+  MyServer(boost::asio::io_context& io_context)
+      : acceptor_(io_context, tcp::endpoint(tcp::v4(), PORT)) {
+    // Конструктор класса MyServer
+    // Инициализируем объект acceptor, который будет ожидать входящих соединений
+    StartAccept();  // Начинаем принимать подключения
+  }
+
  private:
   void StartAccept() {
-    // Создаем новый сокет для входящего соединения
-    tcp::socket socket(acceptor_.get_executor().context());
+    // Создаем новый сокет, используя executor напрямую
+    tcp::socket socket(acceptor_.get_executor());
 
     // Асинхронно принимаем соединение с клиентом
     acceptor_.async_accept(socket, [this,
@@ -59,29 +52,5 @@ class TCP_Server {
     });
   }
 
- public:
-  TCP_Server(boost::asio::io_context& L_io_context, const int L_port)
-      : port_(L_port),
-        acceptor_(L_io_context, tcp::endpoint(tcp::v4(), port_)) {
-    // Конструктор класса TCP_Server
-    // Инициализируем объект acceptor, который будет ожидать входящих соединений
-    StartAccept();  // Начинаем принимать подключения
-  }
+  tcp::acceptor acceptor_;  // Объект, который принимает входящие подключения
 };
-
-/*int main() {
-  try {
-    // Создаем контекст для управления асинхронными операциями
-    boost::asio::io_context io_context;
-
-    // Создаем объект сервера, который начинает ожидание подключений
-    TCP_Server server(io_context, PORT);
-
-    // Запускаем главный цикл обработки событий
-    io_context.run();
-  } catch (std::exception& e) {
-    std::cerr << "Ошибка: " << e.what() << std::endl;
-  }
-
-  return 0;
-}*/
